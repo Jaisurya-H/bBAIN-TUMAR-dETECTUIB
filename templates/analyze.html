@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>HealTech | Analyze</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: white;
+        }
+
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            position: fixed;
+            background: #0a3d62;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            color: #00d4ff;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            margin: 15px 0;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            color: #00d4ff;
+        }
+
+        .sidebar a.active {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .content {
+            margin-left: 220px;
+            padding: 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h2,
+        h3 {
+            color: #00d4ff;
+            margin-top: 0;
+        }
+
+        p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        input[type="file"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: none;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+
+        select option {
+            background: #0f172a;
+            color: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #00d4ff;
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            box-shadow: 0 0 15px #00d4ff;
+        }
+
+        .result-card {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .risk-low {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .risk-moderate {
+            background: rgba(234, 179, 8, 0.2);
+            color: #facc15;
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .confidence-meter {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: #00d4ff;
+            transition: width 1s ease;
+            box-shadow: 0 0 10px #00d4ff;
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-height: 300px;
+            object-fit: contain;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .download-btn {
+            background: transparent;
+            color: #00d4ff;
+            border: 1px solid #00d4ff;
+            margin-top: 15px;
+        }
+
+        .download-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>HealTech</h2>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/analyze" class="active">Analyze Scan</a>
+        <a href="/history">Reports</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <div class="content">
+        <div class="card">
+            <h2>MRI Analysis Config</h2>
+            <p>Upload an MRI scan to detect anomalies using our AI models.</p>
+
+            <form action="/analyze" method="POST" enctype="multipart/form-data">
+                <label style="font-weight:600; color:#94a3b8;">Select AI Model</label>
+                <select name="model_choice">
+                    <option value="lr">Logistic Regression (Standard)</option>
+                    <option value="svm">Support Vector Machine (Experimental)</option>
+                </select>
+
+                <label style="font-weight:600; color:#94a3b8;">Upload Scan (JPG/PNG)</label>
+                <input type="file" name="file" id="fileInput" required accept="image/*">
+
+                <button type="submit">Run Diagnostics</button>
+            </form>
+
+            <img id="previewImage" alt="MRI Preview">
+
+            {% if prediction %}
+            <div class="result-card">
+                <h3>Diagnostic Report</h3>
+
+                <div class="risk-badge {{ risk_class }}">
+                    {{ risk_label }} Risk Indicator
+                </div>
+
+                <p style="font-size: 1.1em; color: white;">
+                    <strong>Primary Finding:</strong> {{ prediction }}
+                </p>
+
+                <p>
+                    {{ summary_text }}
+                </p>
+
+                <div style="margin-top: 20px;">
+                    <label style="font-size: 0.9em; color: #94a3b8;">AI Confidence Score: {{ confidence }}%</label>
+                    <div class="confidence-meter">
+                        <div class="confidence-fill" style="width: {{ confidence }}%;"></div>
+                    </div>
+                </div>
+
+                {% if image_path %}
+                <div style="margin-top:20px;">
+                    <img src="{{ image_path }}" style="display:block; width:150px; height:150px; object-fit:cover;"
+                        alt="Analyzed MRI">
+                </div>
+                {% endif %}
+
+                <a href="/download_report/{{ prediction }}/{{ confidence }}">
+                    <button class="download-btn">Download PDF Report</button>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById("fileInput");
+        const previewImage = document.getElementById("previewImage");
+
+        fileInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

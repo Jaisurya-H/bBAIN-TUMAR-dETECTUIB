@@ -1,0 +1,26 @@
+body {
+    background: #1e3c72;
+    font-family: Arial;
+    color: white;
+    text-align: center;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    margin: auto;
+    width: 400px;
+    border-radius: 10px;
+}
+
+button {
+    background: #00c6ff;
+    padding: 10px 20px;
+    border: none;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.result {
+    margin-top: 20px;
+}
