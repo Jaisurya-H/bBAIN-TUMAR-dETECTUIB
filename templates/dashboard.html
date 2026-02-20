@@ -1,135 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>HealTech Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: #0f172a;
-            color: white;
-        }
-
-        .sidebar {
-            width: 220px;
-            height: 100vh;
-            position: fixed;
-            background: #0a3d62;
-            padding: 20px;
-        }
-
-        .sidebar h2 {
-            color: #00d4ff;
-        }
-
-        .sidebar a {
-            display: block;
-            margin: 15px 0;
-            color: white;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover {
-            color: #00d4ff;
-        }
-
-        .content {
-            margin-left: 220px;
-            padding: 40px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(15px);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-        }
-
-        .btn {
-            padding: 12px 20px;
-            background: #00d4ff;
-            border: none;
-            border-radius: 8px;
-            color: #0f172a;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            box-shadow: 0 0 15px #00d4ff;
-        }
-
-        .gauge {
-            width: 150px;
-            height: 150px;
-            margin: auto;
-        }
-
-        svg circle {
-            fill: none;
-            stroke-width: 12;
-            stroke-linecap: round;
-        }
-
-        .bg {
-            stroke: rgba(255, 255, 255, 0.1);
-        }
-
-        .progress {
-            stroke: #00d4ff;
-            stroke-dasharray: 440;
-
-            stroke-dashoffset:calc(440 - (440 * {
-                            {
-                            total|default(0)
-                        }
-                    }
-
-                    / 100));
-            transition:stroke-dashoffset 1s ease;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealTech | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Lineicons -->
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet">
 </head>
 
 <body>
 
-    <div class="sidebar">
-        <h2>HealTech</h2>
-        <a href="/dashboard">Dashboard</a>
-        <a href="/analyze">Analyze Scan</a>
-        <a href="/history">Reports</a>
-        <a href="/logout">Logout</a>
-    </div>
+    <div class="app-container">
 
-    <div class="content">
-        <h1>Welcome, {{ name }}</h1>
-
-        <div class="card">
-            <h3>Total Scans</h3>
-            <h2>{{ total }}</h2>
-        </div>
-
-        <div class="card">
-            <h3>Risk Index Overview</h3>
-
-            <div class="gauge">
-                <svg width="150" height="150">
-                    <circle class="bg" cx="75" cy="75" r="70" />
-                    <circle class="progress" cx="75" cy="75" r="70" />
-                </svg>
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="brand">
+                <i class="lni lni-pulse"></i> HealTech
             </div>
+            <button class="btn btn-outline" id="menuToggle">
+                <i class="lni lni-menu"></i>
+            </button>
         </div>
 
-        <div class="card">
-            <h3>Start New Analysis</h3>
-            <a href="/analyze" class="btn">Upload MRI</a>
-        </div>
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <i class="lni lni-pulse"></i> HealTech
+            </div>
+
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link active">
+                        <i class="lni lni-grid-alt nav-icon"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/analyze" class="nav-link">
+                        <i class="lni lni-microscope nav-icon"></i> Analyze Scan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/history" class="nav-link">
+                        <i class="lni lni-files nav-icon"></i> Reports History
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: auto;">
+                    <a href="/logout" class="nav-link" style="color: var(--danger);">
+                        <i class="lni lni-exit nav-icon"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <header
+                    style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1>Dashboard Overview</h1>
+                        <p>Welcome back, <span style="color: var(--accent);">{{ name }}</span>.</p>
+                    </div>
+                    <a href="/analyze" class="btn btn-primary">
+                        <i class="lni lni-plus"></i> New Analysis
+                    </a>
+                </header>
+
+                <div class="row"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+
+                    <!-- Stats Card -->
+                    <div class="card">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                            <h3 style="margin: 0; font-size: 1.25rem;">Total Scans</h3>
+                            <div
+                                style="background: rgba(6, 182, 212, 0.1); padding: 0.5rem; border-radius: 0.5rem; color: var(--accent);">
+                                <i class="lni lni-stats-up" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <h2 style="font-size: 3rem; margin: 0; color: white;">{{ total }}</h2>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem;">Lifetime analyses performed</p>
+                    </div>
+
+                    <!-- Risk Overview Card (Placeholder for now as backend doesn't pass detailed stats) -->
+                    <div class="card">
+                        <div
+                            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                            <h3 style="margin: 0; font-size: 1.25rem;">System Status</h3>
+                            <div
+                                style="background: rgba(34, 197, 94, 0.1); padding: 0.5rem; border-radius: 0.5rem; color: var(--success);">
+                                <i class="lni lni-checkmark-circle" style="font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: var(--success); width: 12px; height: 12px; border-radius: 50%;">
+                            </div>
+                            <span style="color: white; font-weight: 500;">All Systems Operational</span>
+                        </div>
+                        <p style="margin: 0.5rem 0 0 0; font-size: 0.875rem;">Models loaded and ready</p>
+                    </div>
+
+                </div>
+
+                <!-- Recent Activity Placeholder -->
+                <div style="margin-top: 2rem;">
+                    <div class="card">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3 style="margin: 0;">Quick Actions</h3>
+                        </div>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <a href="/analyze" class="btn btn-outline" style="justify-content: flex-start;">
+                                <i class="lni lni-microscope"></i> Start New Diagnostics
+                            </a>
+                            <a href="/history" class="btn btn-outline" style="justify-content: flex-start;">
+                                <i class="lni lni-agenda"></i> View Past Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
     </div>
 
+    <script>
+        // Sidebar Toggle for Mobile
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

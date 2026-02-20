@@ -1,264 +1,234 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>HealTech | Analyze</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: #0f172a;
-            color: white;
-        }
-
-        .sidebar {
-            width: 220px;
-            height: 100vh;
-            position: fixed;
-            background: #0a3d62;
-            padding: 20px;
-        }
-
-        .sidebar h2 {
-            color: #00d4ff;
-            margin-top: 0;
-            margin-bottom: 30px;
-        }
-
-        .sidebar a {
-            display: block;
-            margin: 15px 0;
-            color: white;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover {
-            color: #00d4ff;
-        }
-
-        .sidebar a.active {
-            color: #00d4ff;
-            font-weight: 600;
-        }
-
-        .content {
-            margin-left: 220px;
-            padding: 40px;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(15px);
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        h2,
-        h3 {
-            color: #00d4ff;
-            margin-top: 0;
-        }
-
-        p {
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
-
-        input[type="file"],
-        select {
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border: none;
-            border-radius: 8px;
-            box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-family: 'Inter', sans-serif;
-        }
-
-        select option {
-            background: #0f172a;
-            color: white;
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            background: #00d4ff;
-            color: #0f172a;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            box-shadow: 0 0 15px #00d4ff;
-        }
-
-        .result-card {
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .risk-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9em;
-            margin-bottom: 15px;
-        }
-
-        .risk-low {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
-        }
-
-        .risk-moderate {
-            background: rgba(234, 179, 8, 0.2);
-            color: #facc15;
-        }
-
-        .risk-high {
-            background: rgba(239, 68, 68, 0.2);
-            color: #f87171;
-        }
-
-        .confidence-meter {
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            background: #00d4ff;
-            transition: width 1s ease;
-            box-shadow: 0 0 10px #00d4ff;
-        }
-
-        img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 20px;
-            max-height: 300px;
-            object-fit: contain;
-            display: none;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .download-btn {
-            background: transparent;
-            color: #00d4ff;
-            border: 1px solid #00d4ff;
-            margin-top: 15px;
-        }
-
-        .download-btn:hover {
-            background: rgba(0, 212, 255, 0.1);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-        }
-    </style>
+    <title>HealTech | Advanced MRI Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Lineicons for icons -->
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet">
 </head>
 
 <body>
 
-    <div class="sidebar">
-        <h2>HealTech</h2>
-        <a href="/dashboard">Dashboard</a>
-        <a href="/analyze" class="active">Analyze Scan</a>
-        <a href="/history">Reports</a>
-        <a href="/logout">Logout</a>
-    </div>
+    <div class="app-container">
 
-    <div class="content">
-        <div class="card">
-            <h2>MRI Analysis Config</h2>
-            <p>Upload an MRI scan to detect anomalies using our AI models.</p>
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="brand">
+                <i class="lni lni-pulse"></i> HealTech
+            </div>
+            <button class="btn btn-outline" id="menuToggle">
+                <i class="lni lni-menu"></i>
+            </button>
+        </div>
 
-            <form action="/analyze" method="POST" enctype="multipart/form-data">
-                <label style="font-weight:600; color:#94a3b8;">Select AI Model</label>
-                <select name="model_choice">
-                    <option value="lr">Logistic Regression (Standard)</option>
-                    <option value="svm">Support Vector Machine (Experimental)</option>
-                </select>
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <i class="lni lni-pulse"></i> HealTech
+            </div>
 
-                <label style="font-weight:600; color:#94a3b8;">Upload Scan (JPG/PNG)</label>
-                <input type="file" name="file" id="fileInput" required accept="image/*">
+            <ul class="nav-links">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link">
+                        <i class="lni lni-grid-alt nav-icon"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/analyze" class="nav-link active">
+                        <i class="lni lni-microscope nav-icon"></i> Analyze Scan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/history" class="nav-link">
+                        <i class="lni lni-files nav-icon"></i> Reports History
+                    </a>
+                </li>
+                <li class="nav-item" style="margin-top: auto;">
+                    <a href="/logout" class="nav-link" style="color: var(--danger);">
+                        <i class="lni lni-exit nav-icon"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
 
-                <button type="submit">Run Diagnostics</button>
-            </form>
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <header style="margin-bottom: 2rem;">
+                    <h1>MRI Diagnostic Analysis</h1>
+                    <p>Upload patient MRI scans for AI-powered tumor detection and classification.</p>
+                </header>
 
-            <img id="previewImage" alt="MRI Preview">
+                <div class="row">
+                    <!-- Upload Section -->
+                    <div class="col-lg-8" style="max-width: 800px; margin: 0 auto;">
+                        <div class="card">
+                            <form action="/analyze" method="POST" enctype="multipart/form-data" id="uploadForm">
 
-            {% if prediction %}
-            <div class="result-card">
-                <h3>Diagnostic Report</h3>
+                                <div class="form-group">
+                                    <label>Select AI Model Configuration</label>
+                                    <select name="model_choice">
+                                        <option value="lr">Logistic Regression (Standard - 94% Accuracy)</option>
+                                        <option value="svm">Support Vector Machine (Experimental)</option>
+                                    </select>
+                                </div>
 
-                <div class="risk-badge {{ risk_class }}">
-                    {{ risk_label }} Risk Indicator
-                </div>
+                                <div class="form-group">
+                                    <label>Upload MRI Scan (DICOM/JPG/PNG)</label>
+                                    <div class="upload-area" id="dropZone">
+                                        <i class="lni lni-cloud-upload upload-icon"></i>
+                                        <h3>Drag & Drop MRI Scan Here</h3>
+                                        <p>or click to browse files</p>
+                                        <input type="file" name="file" id="fileInput" hidden required accept="image/*">
+                                        <p id="fileName"
+                                            style="color: var(--accent); margin-top: 1rem; font-weight: 600;"></p>
+                                    </div>
+                                </div>
 
-                <p style="font-size: 1.1em; color: white;">
-                    <strong>Primary Finding:</strong> {{ prediction }}
-                </p>
+                                <div id="previewContainer"
+                                    style="display: none; text-align: center; margin-bottom: 1.5rem;">
+                                    <img id="imagePreview"
+                                        style="max-height: 250px; border-radius: 0.5rem; border: 1px solid var(--border-color);">
+                                </div>
 
-                <p>
-                    {{ summary_text }}
-                </p>
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                    Run Diagnostic Analysis <i class="lni lni-arrow-right"
+                                        style="margin-left: 0.5rem;"></i>
+                                </button>
+                            </form>
+                        </div>
 
-                <div style="margin-top: 20px;">
-                    <label style="font-size: 0.9em; color: #94a3b8;">AI Confidence Score: {{ confidence }}%</label>
-                    <div class="confidence-meter">
-                        <div class="confidence-fill" style="width: {{ confidence }}%;"></div>
+                        {% if prediction %}
+                        <div class="card results-card" style="border-left: 4px solid var(--accent);">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                                <div>
+                                    <span
+                                        style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary);">Primary
+                                        Finding</span>
+                                    <h2 style="font-size: 2rem; color: white; margin: 0.5rem 0;">{{ prediction }}</h2>
+                                </div>
+
+                                <div>
+                                    {% if risk_class == 'risk-low' %}
+                                    <span class="badge badge-success">Low Risk</span>
+                                    {% elif risk_class == 'risk-moderate' %}
+                                    <span class="badge badge-warning">Moderate Risk</span>
+                                    {% else %}
+                                    <span class="badge badge-danger">High Risk</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div
+                                style="margin-top: 1.5rem; background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 0.5rem;">
+                                <p style="margin-bottom: 0;">{{ summary_text }}</p>
+                            </div>
+
+                            <div style="margin-top: 2rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <label>AI Confidence Score</label>
+                                    <span style="font-weight: 700; color: var(--accent);">{{ confidence }}%</span>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 0%" data-width="{{ confidence }}%"></div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                                <a href="/download_report/{{ prediction }}/{{ confidence }}" class="btn btn-outline">
+                                    <i class="lni lni-download"></i> Download Full Report (PDF)
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+
                     </div>
                 </div>
-
-                {% if image_path %}
-                <div style="margin-top:20px;">
-                    <img src="{{ image_path }}" style="display:block; width:150px; height:150px; object-fit:cover;"
-                        alt="Analyzed MRI">
-                </div>
-                {% endif %}
-
-                <a href="/download_report/{{ prediction }}/{{ confidence }}">
-                    <button class="download-btn">Download PDF Report</button>
-                </a>
             </div>
-            {% endif %}
-        </div>
+        </main>
     </div>
 
     <script>
-        const fileInput = document.getElementById("fileInput");
-        const previewImage = document.getElementById("previewImage");
+        // Sidebar Toggle for Mobile
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.querySelector('.main-content'); // Optional: push content
 
-        fileInput.addEventListener("change", function () {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    previewImage.src = e.target.result;
-                    previewImage.style.display = "block";
-                };
-                reader.readAsDataURL(file);
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target) && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
             }
         });
-    </script>
 
+        // File Upload Logic
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const previewContainer = document.getElementById('previewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+
+        // Click to upload
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Drag & Drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFile(fileInput.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            fileNameDisplay.textContent = "Selected: " + file.name;
+
+            // Preview Image
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Animate Progress Bar on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                setTimeout(() => {
+                    bar.style.width = bar.getAttribute('data-width');
+                }, 300);
+            });
+        });
+    </script>
 </body>
 
 </html>
