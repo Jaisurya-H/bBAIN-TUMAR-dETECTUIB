@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>HealTech | MRI Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            background: #0a3d62;
+            position: fixed;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            color: #00d4ff;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+        .sidebar a:hover {
+            color: #00d4ff;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 220px;
+            padding: 40px;
+        }
+
+        /* Upload Card */
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .drop-zone {
+            border: 2px dashed #00d4ff;
+            padding: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .drop-zone:hover {
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #00d4ff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #0f172a;
+        }
+
+        button:hover {
+            box-shadow: 0 0 15px #00d4ff;
+        }
+
+        /* Result Section */
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        .risk-low {
+            color: #00ff88;
+        }
+
+        .risk-moderate {
+            color: #ffcc00;
+        }
+
+        .risk-high {
+            color: #ff4d4d;
+        }
+
+        /* Gauge */
+        .gauge {
+            width: 160px;
+            height: 160px;
+            margin: 20px auto;
+        }
+
+        svg circle {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+        }
+
+        .bg {
+            stroke: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress {
+            stroke: #00d4ff;
+            stroke-dasharray: 440;
+
+            /* Fixed CSS calc syntax */
+            stroke-dashoffset: calc(440 - (440 * {
+                            {
+                            confidence if confidence else 0
+                        }
+                    }
+
+                    / 100));
+            transition: stroke-dashoffset 1s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>HealTech</h2>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/history">Reports</a>
+        <a href="/logout">Logout</a>
+    </div>
+
+    <div class="content">
+        <h1>MRI Analysis</h1>
+
+        <div class="card">
+            <!-- Ensure correct action route -->
+            <form action="/analyze" method="POST" enctype="multipart/form-data">
+
+                <label class="drop-zone" for="fileInput">
+                    Drag & Drop MRI Image<br>or Click to Upload
+                </label>
+
+                <input type="file" id="fileInput" name="file" required>
+
+                <button type="submit">Analyze Scan</button>
+            </form>
+        </div>
+
+        <!-- Changed 'result' to 'prediction' to match app.py -->
+        {% if prediction %}
+        <div class="result">
+
+            <h2>Scan Result</h2>
+
+            <h3>{{ prediction }}</h3>
+
+            <!-- Changed 'risk' to 'risk_label' to match app.py -->
+            {% if risk_label == "Low Risk" %}
+            <h4 class="risk-low">{{ risk_label }}</h4>
+            {% elif risk_label == "Moderate Risk" %}
+            <h4 class="risk-moderate">{{ risk_label }}</h4>
+            {% else %}
+            <h4 class="risk-high">{{ risk_label }}</h4>
+            {% endif %}
+
+            <div class="gauge">
+                <svg width="160" height="160">
+                    <circle class="bg" cx="80" cy="80" r="70" />
+                    <circle class="progress" cx="80" cy="80" r="70" />
+                </svg>
+            </div>
+
+            <p>Confidence: {{ confidence }}%</p>
+
+            <!-- Fixed download link to match app.py route -->
+            <a href="/download_report/{{ prediction }}/{{ confidence }}">
+                <button>Download Report</button>
+            </a>
+
+        </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Added script to make file input functional via label click, if needed explicitly, though label for works standardly -->
+    <script>
+        // Optional: Add drag and drop functionality if desired
+        const dropZone = document.querySelector('.drop-zone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.background = 'rgba(0, 212, 255, 0.2)';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.background = '';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '';
+            fileInput.files = e.dataTransfer.files;
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                dropZone.innerHTML = "File Selected: " + fileInput.files[0].name;
+            }
+        });
+    </script>
+</body>
+
+</html>
